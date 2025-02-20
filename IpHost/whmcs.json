@@ -1,0 +1,23 @@
+{
+  "schema": "1.0",
+  "type": "whmcs-registrars",
+  "name": "IpHost",
+  "category": "domains",
+  "description": {
+    "name": "IpHost",
+    "tagline": "A provider of reseller wholesale domain services."
+  },
+  "logo": {
+    "filename": "logo.png"
+  },
+  "support": {
+    "homepage": "https:\/\/www.iphost.net\/",
+    "docs_url": "https:\/\/www.iphost.net\/"
+  },
+  "authors": [
+    {
+      "name": "IpHost",
+      "homepage": "https:\/\/www.iphost.net\/"
+    }
+  ]
+}
