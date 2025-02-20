@@ -44,7 +44,7 @@ add_hook('AdminHomeWidgets', 1, function($vars) {
         $where = array("setting"=>'ShowLog');
         $result = select_query($table,$fields,$where);
         $data = mysql_fetch_array($result);
-        //$this->showLog = $data['setting'];
+        
         $showlog = decrypt($data[0]);
 
         if ($showlog === "on") {
