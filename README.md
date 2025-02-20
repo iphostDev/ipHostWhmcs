@@ -5,7 +5,7 @@ Plugin για σύνδεση του API της ipHost με το WHMCS
 
 ## Eγκατάσταση (Installation)
 
-- Ανεβάστε τον φάκελο iphost μέσα στον φάκελο modules/registrars
+- Ανεβάστε τον φάκελο ipHost μέσα στον φάκελο modules/registrars
 - Από το configuration-> domain registrars->registrar settings επιλέξτε IpHost στη συνέχεια συμπληρώστε τo apiKey που έχετε από την IpHost
 - Από το configuration->domain pricing προσθέστε όλα τα extensions που θέλετε να έχετε, καθώς και τις τιμές τις οποίες θα τα χρεώνετε. 
 
