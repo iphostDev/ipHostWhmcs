@@ -40,7 +40,6 @@ $postfields = array('domain' => $domain);
         ),
     ));
 
-
     $response = curl_exec($curl);
     $jsonData = json_decode($response);
 
