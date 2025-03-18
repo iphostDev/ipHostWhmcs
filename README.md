@@ -20,6 +20,8 @@ Plugin για σύνδεση του API της ipHost με το WHMCS
 
 ## Συγχρονισμός (Sync)
 
+Για να εξασφαλίσετε τη σωστή εμφάνιση των ονομάτων χώρου (domain names), βεβαιωθείτε ότι χρησιμοποιούνται πάντα πεζά (μικρά) γράμματα.
+
 To WHMCS μπορεί να συγχρονίζει τα expiry_date και next_renew_date σύμφωνα με την [IpHost].
 
 - Μεταβείτε στο Configuration > System Settings > Automation Settings και να επιλέξετε αυτά που θέλετε στις επιλογές:
