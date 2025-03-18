@@ -25,6 +25,7 @@ To WHMCS μπορεί να συγχρονίζει τα expiry_date και next_r
 - Domain Sync Enabled - Πρέπει να είναι τσεκαρισμένο για να λειτουργεί το SYNCHRONIZATION.
 - Sync Next Due Date - Πρέπει να είναι τσεκαρισμένο αν θέλετε να ανανεώνονται και τα next due dates, όπως τα expiry πεδία.
 - Domain Sync Notify Only - Πρέπει να είναι τσεκαρισμένο αν δε θέλετε να ανανεώνονται αυτόματα οι ημερομηνίες, απλά να στέλνεται ένα ενημερωτικό email στους admins. (https://docs.whmcs.com/Domain_Synchronisation)
+- Για τη λειτουργία του whois βεβειωθείτε ότι εχει επιλέξει σαν Lookup Provider την IpHost (https://prnt.sc/iXoYXqeihz8b)
 
 - Για την ενεργοποίηση του cron φροντίστε για την ενεργοποίηση του. (http://docs.whmcs.com/Domains_Tab#Domain_Sync_Enabled)
 
