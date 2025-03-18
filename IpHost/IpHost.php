@@ -320,25 +320,7 @@ function IpHost_GetDomainSuggestions($params){
 
 
 function GetWhoisInformation($params) {
-    // $sld = $params['sld'];
-    // $tld = $params['tld'];
-    // $domain = $sld . '.' . $tld;
 
-    // // Make API call to your registrar's WHOIS service
-    // //$whoisData = yourRegistrarApiCall($domain);
-    // //var_dump($domain);die;
-
-    // if ($whoisData) {
-    //     return array(
-    //         'result' => 'success',
-    //         'whois' => $whoisData
-    //     );
-    // } else {
-    //     return array(
-    //         'result' => 'error',
-    //         'whois' => 'Unable to retrieve WHOIS information for ' . $domain
-    //     );
-    // }
 }
 
 
@@ -596,7 +578,7 @@ function IpHost_RegisterNameserver($params){
     
     $postfields = array(
         'domain_id'  => $params['sld'].'.'.$params['tld'],
-        //κανω replace για να στείλω μόνο το όνομα του subdomain και κόβω και την τελεια στο τελος
+        //replace για να στείλω μόνο το όνομα του subdomain και κόβω και την τελεια στο τελος
         'subdomain' =>  rtrim(str_replace($params['sld'].'.'.$params['tld'],"",$params['nameserver']),"."),
         'ip' => $params['ipaddress']
     );
@@ -899,11 +881,6 @@ function IpHost_GetContactDetails($params){
 
         if ( $api->getFromResponse('success') ) {
             $data =  $api->getFromResponse('domain');
-
-
-            //var_dump($data);
-            //die;
-
             
             if (sizeof($data['technical']) == 1) {
                 $techData = $data['technical'][0];
@@ -922,11 +899,6 @@ function IpHost_GetContactDetails($params){
             } else {
                 $adminData = $data['administrators'];
             }
-
-
-            //var_dump($techData);
-            //die;
-
 
             $registrar_name = explode(" ",$data['owner']['details']['name']);
             $technical_name = explode(" ",$techData['details']['name']);
@@ -1273,7 +1245,7 @@ function IpHost_GetDomainInformation($params) {
     $APItoken = $params['APItoken'];
     $lockStatus = $params['lockenabled'];
     $domain = $params['domain'];
-    $call = '/domain/'.$domain;
+    $call = '/domain/' . strtolower($domain);
 
     try {
         
@@ -1293,17 +1265,6 @@ function IpHost_GetDomainInformation($params) {
             }
 
             $domain->setNameservers($nameservers);
-
-            // if ($response['status']['id'] === 4 ) {
-            //     $status = 'active';
-            // } elseif ($response['status']['id'] === 8) {
-            //     $status = 'expired';
-            // } elseif ($response['status']['id'] === 9) {
-            //     $status = 'suspended';    
-            // }
-
-            // $domain->setRegistrationStatus($status);
-
             return $domain;
         }
 
