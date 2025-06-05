@@ -44,7 +44,7 @@ add_hook('AdminHomeWidgets', 1, function($vars) {
         $where = array("setting"=>'ShowLog');
         $result = select_query($table,$fields,$where);
         $data = mysql_fetch_array($result);
-        
+        //$this->showLog = $data['setting'];
         $showlog = decrypt($data[0]);
 
         if ($showlog === "on") {
@@ -163,7 +163,51 @@ add_hook('AdminAreaFooterOutput', 1, function($vars) {
             successBox.parentNode.insertBefore(infoDiv, successBox);
         }
 
-        function techElements() {
+
+                    function registrarElements() {
+                        //tech
+                        var wc_technical = document.querySelector('input[name="wc[Registrant]"]');
+                        if (wc_technical) {
+                            wc_technical.style.display = 'none';
+                            if (wc_technical.parentElement) {
+                                wc_technical.parentElement.style.display = 'none';
+                            }
+                        }
+
+                        var sel_technical = document.querySelector('select[name="sel[Registrant]"]');
+                        if (sel_technical) {
+                             sel_technical.style.display = 'none';
+                             if (sel_technical.parentElement) {
+                                sel_technical.parentElement.style.display = 'none';
+                            }
+                        }
+
+                        var inputContact = document.querySelector('input[name="contactdetails[Registrant][IPHOST_contact]"]');
+                        if (inputContact) {
+                            var parentRow = inputContact.closest('tr');
+                            if (parentRow) {
+                                parentRow.style.display = 'none';
+                            }
+                        }
+
+                        //read only
+                        var techFirstname = document.querySelector('input[name="contactdetails[Registrant][First Name]"]');
+                            if (techFirstname) {
+                                techFirstname.readOnly = true; // Makes the field read-only
+                        }
+                        var techLastName = document.querySelector('input[name="contactdetails[Registrant][Last Name]"]');
+                            if (techLastName) {
+                                techLastName.readOnly = true; // Makes the field read-only
+                        }
+                        var techCompany = document.querySelector('input[name="contactdetails[Registrant][Company Name]"]');
+                            if (techCompany) {
+                                techCompany.readOnly = true; // Makes the field read-only
+                        }
+                    }
+
+
+
+                    function techElements() {
                         //tech
                         var wc_technical = document.querySelector('input[name="wc[Technical]"]');
                         if (wc_technical) {
@@ -249,6 +293,7 @@ add_hook('AdminAreaFooterOutput', 1, function($vars) {
 
 
                     function AdminElements() {
+                        
                         //admin
                         var wc_admin = document.querySelector('input[name="wc[Admin]"]');
                         if (wc_admin) {
@@ -336,6 +381,8 @@ add_hook('AdminAreaFooterOutput', 1, function($vars) {
 
         if (registrar === 'IpHost') { 
                     //Start HERE
+
+                    registrarElements()
                     techElements()
                     billingElements()
                     AdminElements()
@@ -668,13 +715,17 @@ add_hook('ClientAreaPage', 1, function($params) {
 
 add_hook('PreRegistrarSaveContactDetails', 1, function($vars) {
 
-    //var_dump($vars);
-    //die;
-
     $errors = [];
     $forms = ['Technical','Billing','Admin'];
 
     foreach ($forms as $form) {
+
+
+        $contact = $vars['params']['contactdetails'][$form];
+        // Αν λείπει το email, παραλείπουμε τη φόρμα
+        if (empty($contact['Email Address'])) {
+            continue;
+        }
         
         $firstname = $vars['params']['contactdetails'][$form]['First Name'];
         $lastname = $vars['params']['contactdetails'][$form]['Last Name'];
@@ -688,11 +739,11 @@ add_hook('PreRegistrarSaveContactDetails', 1, function($vars) {
         $phone = $vars['params']['contactdetails'][$form]['Phone Number'];
 
 
-        if (empty($firstname) || !preg_match('/^[a-zA-Z\s\-]+$/', $firstname)) {
-            $errors[] = $form.": First name required</strong>.";
+        if (empty($firstname) || !preg_match('/^[\p{L}\s\-]+$/u', $firstname)) {
+            $errors[] = $form.": First name required.";
         }
         if (strlen($company) == 0) {
-            if (empty($lastname) || !preg_match('/^[a-zA-Z\s\-]+$/', $lastname)) {
+            if (empty($lastname) || !preg_match('/^[\p{L}\s\-]+$/u', $lastname)) {
                 $errors[] = $form.": Last name required.";
             }
         }    
@@ -706,7 +757,7 @@ add_hook('PreRegistrarSaveContactDetails', 1, function($vars) {
             $errors[] = $form.": State required.";
         }
         if (empty($postcode)) {
-            $errors[] = $form.": State required.";
+            $errors[] = $form.": PostCode required.";
         }
         if (empty($email)) {
             $errors[] = $form.": Email Required.";
