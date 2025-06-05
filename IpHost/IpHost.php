@@ -865,10 +865,8 @@ function IpHost_GetNameservers($params){
 
 }
 
+
 function IpHost_GetContactDetails($params){
-    //var_dump($params);
-    //die;
-    //return;
 
     $domain = $params['sld'].'.'.$params['tld'];
     $APItoken = $params['APItoken'];
@@ -881,24 +879,20 @@ function IpHost_GetContactDetails($params){
 
         if ( $api->getFromResponse('success') ) {
             $data =  $api->getFromResponse('domain');
-            
+
+
             if (sizeof($data['technical']) == 1) {
                 $techData = $data['technical'][0];
-            } else {
-                $techData = $data['technical'];
             }
 
             if (sizeof($data['billing']) == 1) {
                 $billingData = $data['billing'][0];
-            } else {
-                $billingData = $data['billing'];
-            }
+            } 
 
             if (sizeof($data['administrators']) == 1) {
                 $adminData = $data['administrators'][0];
-            } else {
-                $adminData = $data['administrators'];
-            }
+            } 
+
 
             $registrar_name = explode(" ",$data['owner']['details']['name']);
             $technical_name = explode(" ",$techData['details']['name']);
@@ -907,21 +901,23 @@ function IpHost_GetContactDetails($params){
 
 
             $result =  array(
-                // "Registrant" => array(
-                //     'First Name' => $registrar_name[0],
-                //     'Last Name' => $registrar_name[1],
-                //     'Company Name' => $data['owner']['details']['organization'],
-                //     'Email Address' => $data['owner']['details']['email'],
-                //     'Address 1' => $data['owner']['details']['address'],
-                //     //'Address 2' => $api->getFromResponse('registrant.address2'),
-                //     //'City' => $data['owner']['details']['city'],
-                //     'City' => $data['owner']['details']['city'],
-                //     'State' => $data['owner']['details']['state'],
-                //     'Postcode' => $data['owner']['details']['postcode'],
-                //     //'Country' => $data['owner']['details']['organization'],
-                //     'Phone Number' => $data['owner']['details']['phone'][0],
-                //     'Fax Number' => $data['owner']['details']['fax'],
-                // ),
+                "Registrant" => array(
+                    'First Name' => $registrar_name[0],
+                    'Last Name' => $registrar_name[1],
+                    'Company Name' => $data['owner']['details']['organization'],
+                    'Email Address' => $data['owner']['details']['email'],
+                    'Address 1' => $data['owner']['details']['address'],
+                    //'Address 2' => $api->getFromResponse('registrant.address2'),
+                    //'City' => $data['owner']['details']['city'],
+                    'City' => $data['owner']['details']['city'],
+                    'State' => $data['owner']['details']['state'],
+                    'Postcode' => $data['owner']['details']['postcode'],
+                    //'Country' => $data['owner']['details']['organization'],
+                    //'Phone Number' => $data['owner']['details']['phone'][0],
+                    'Phone Number' => is_array($data['owner']['details']['phone']) ? $data['owner']['details']['phone'][0] : $data['owner']['details']['phone'],
+                    'Fax Number' => $data['owner']['details']['fax'],
+                    'IPHOST_contact' => $data['owner']['id'],
+                ),
                 "Technical" => array(
                     'First Name' => $technical_name[0],
                     'Last Name' => $technical_name[1],
@@ -969,10 +965,6 @@ function IpHost_GetContactDetails($params){
                 )
             );
 
-
-                //var_dump($result);
-                //die;
-
                 logModuleCall(
                     'IpHost',
                     'GetContactDetails',
@@ -1003,9 +995,46 @@ function IpHost_SaveContactDetails($params){
 
      $api = new ApiClient();
 
+     //start owner
+     $ownerData = array(
+            "type" => strlen($contactDetails['Registrant']['Company Name']) > 0 ? 2 : 1,
+            "name" => $contactDetails['Registrant']['First Name'],
+            "int_name" => $greeklish->convertText($contactDetails['Registrant']['First Name']),
+            "surname" => $contactDetails['Registrant']['Last Name'],
+            "int_surname" => $greeklish->convertText($contactDetails['Registrant']['Last Name']),
+            "organization" => $contactDetails['Registrant']['Company Name'],
+            "int_organization" => $greeklish->convertText($contactDetails['Registrant']['Company Name']),
+            "email" => $contactDetails['Registrant']['Email Address'],
+            "address" => $contactDetails['Registrant']['Address 1'],
+            "int_address" => $greeklish->convertText($contactDetails['Registrant']['Address 1']),
+            "city" => $contactDetails['Registrant']['City'],
+            "int_city" => $greeklish->convertText($contactDetails['Registrant']['City']),
+            "province" => $contactDetails['Registrant']['State'],
+            "int_province" => $greeklish->convertText($contactDetails['Registrant']['State']),
+            "country_id" => 86,
+            "citizenship" => 56,
+            "postcode" => $contactDetails['Registrant']['Postcode'],
+            "telephones" => [$contactDetails['Registrant']['Phone Number']],
+            "mobiles" => [],
+            "faxes" => [],
+            "tax_id" => "",
+            "tax_office" => "",
+            "occupation" => ""   
+        );
+
+     $erp_contact_id_for_owner = $contactDetails['Registrant']['IPHOST_contact'];
+
+     if ($erp_contact_id_for_owner) {
+        $api->call('/contact/'.$erp_contact_id_for_owner, $ownerData, $APItoken, 'PUT');
+     } 
+     //end owner
+
+
+
+
      //start tech
      $techData = array(
-            "type" => strlen($contactDetails['Technical']['Company Name'] > 0) ? 2 : 1,
+            "type" => strlen($contactDetails['Technical']['Company Name']) > 0 ? 2 : 1,
             "name" => $contactDetails['Technical']['First Name'],
             "int_name" => $greeklish->convertText($contactDetails['Technical']['First Name']),
             "surname" => $contactDetails['Technical']['Last Name'],
@@ -1032,6 +1061,7 @@ function IpHost_SaveContactDetails($params){
 
      $erp_contact_id = $contactDetails['Technical']['IPHOST_contact'];
 
+
      if ($erp_contact_id) {
         $api->call('/contact/'.$erp_contact_id, $techData, $APItoken, 'PUT');
         $tech_erp_id = $erp_contact_id;
@@ -1048,7 +1078,7 @@ function IpHost_SaveContactDetails($params){
 
      //start billing
      $billingData = array(
-            "type" => strlen($contactDetails['Technical']['Company Name'] > 0) ? 2 : 1,
+            "type" => strlen($contactDetails['Billing']['Company Name']) > 0 ? 2 : 1,
             "name" => $contactDetails['Billing']['First Name'],
             "int_name" => $greeklish->convertText($contactDetails['Billing']['First Name']),
             "surname" => $contactDetails['Billing']['Last Name'],
@@ -1091,7 +1121,7 @@ function IpHost_SaveContactDetails($params){
 
      //start admin
      $adminData = array(
-            "type" => strlen($contactDetails['Technical']['Company Name'] > 0) ? 2 : 1,
+            "type" => strlen($contactDetails['Admin']['Company Name']) > 0 ? 2 : 1,
             "name" => $contactDetails['Admin']['First Name'],
             "int_name" => $greeklish->convertText($contactDetails['Admin']['First Name']),
             "surname" => $contactDetails['Admin']['Last Name'],
@@ -1130,7 +1160,7 @@ function IpHost_SaveContactDetails($params){
      }
      //end admin
 
-     sleep(3);
+     sleep(2);
 
      $erpContacts = [];
      if ($tech_erp_id) {
@@ -1142,9 +1172,19 @@ function IpHost_SaveContactDetails($params){
      if ($admin_erp_id) {
         $erpContacts['administrator'] = [$admin_erp_id];
      }
-     $api->call('/domain/'.$domain.'/contacts', $erpContacts, $APItoken, 'PUT');
+     $x = $api->call('/domain/'.$domain.'/contacts', $erpContacts, $APItoken, 'PUT');
 
-     sleep(3);
+     sleep(2);
+
+
+     logModuleCall(
+                    'IpHost',
+                    'SaveContactDetails',
+                    $erpContacts,
+                    '',
+                    $x,
+                    '',
+                );
 
 }
 
